@@ -22,9 +22,9 @@ import static ru.djets.tgbot.service.factory.creators.KeyboardCreator.getInlineK
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class EditMessageHandlerImpl implements EditMessageHandler {
-    BotStateService service;
+public class AnswerEditMessageHandlerImpl implements AnswerEditMessageHandler {
 
+    BotStateService service;
 
     @Override
     public EditMessageText editSendMessage(CallbackQuery callbackQuery) {

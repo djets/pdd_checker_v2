@@ -15,16 +15,16 @@ public class BotMessageFactory implements BotObjectFactory<SendMessage, TypeMess
     SendMessageCreator ticketsMessageCreator;
     SendMessageCreator ticketQuestionsMessageCreator;
     SendMessageCreator questionMessageCreator;
+    SendMessageCreator outOfQuestionsMessageCreator;
     SendMessageCreator wrongSelectedTicketMessageCreator;
     SendMessageCreator wrongSelectedQuestionMessageCreator;
-
-
 
     public BotMessageFactory(
             @Qualifier("startMessageCreator") SendMessageCreator startSendMessageCreator,
             @Qualifier("ticketsMessageCreator") SendMessageCreator ticketsMessageCreator,
             @Qualifier("ticketQuestionsMessageCreator") SendMessageCreator ticketQuestionsMessageCreator,
             @Qualifier("questionMessageCreator") SendMessageCreator questionMessageCreator,
+            @Qualifier("outOfQuestionsMessageCreator") SendMessageCreator outOfQuestionsMessageCreator,
             @Qualifier("wrongSelectedTicketMessageCreator") SendMessageCreator wrongSelectedTicketMessageCreator,
             @Qualifier("wrongSelectedQuestionMessageCreator") SendMessageCreator wrongSelectedQuestionMessageCreator
     )
@@ -33,6 +33,7 @@ public class BotMessageFactory implements BotObjectFactory<SendMessage, TypeMess
         this.ticketsMessageCreator = ticketsMessageCreator;
         this.ticketQuestionsMessageCreator = ticketQuestionsMessageCreator;
         this.questionMessageCreator = questionMessageCreator;
+        this.outOfQuestionsMessageCreator = outOfQuestionsMessageCreator;
         this.wrongSelectedTicketMessageCreator = wrongSelectedTicketMessageCreator;
         this.wrongSelectedQuestionMessageCreator = wrongSelectedQuestionMessageCreator;
     }
@@ -52,6 +53,9 @@ public class BotMessageFactory implements BotObjectFactory<SendMessage, TypeMess
             }
             case QUESTION -> {
                 return questionMessageCreator.createSendMessage(chatId);
+            }
+            case OUT_OF_QUESTION -> {
+                return outOfQuestionsMessageCreator.createSendMessage(chatId);
             }
             case WRONG_SELECTED_TICKET -> {
                 return wrongSelectedTicketMessageCreator.createSendMessage(chatId);

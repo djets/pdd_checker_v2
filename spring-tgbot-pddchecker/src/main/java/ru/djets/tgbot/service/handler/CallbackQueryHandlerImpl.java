@@ -8,13 +8,17 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.djets.tgbot.dto.QuestionDto;
 import ru.djets.tgbot.dto.TgUserDto;
 import ru.djets.tgbot.enums.TypeMessage;
 import ru.djets.tgbot.enums.TypeSendPhoto;
 import ru.djets.tgbot.service.BotStateService;
+import ru.djets.tgbot.service.LongPollingBotService;
 import ru.djets.tgbot.service.factory.BotObjectFactory;
 import ru.djets.tgbot.service.model.QuestionService;
+
+import java.util.List;
 
 import static ru.djets.tgbot.enums.CallbackPrefix.*;
 
@@ -31,8 +35,12 @@ public class CallbackQueryHandlerImpl implements CallbackQueryHandler {
 
     BotObjectFactory<SendPhoto, TypeSendPhoto, String> botSendPhotoFactory;
 
+    AnswerEditMessageHandler answerEditMessageHandler;
+
+    LongPollingBotService longPollingBotService;
+
     @Override
-    public BotApiMethod<?> handle(CallbackQuery callbackQuery, TgUserDto tgUserDto) {
+    public BotApiMethod<?> handle(CallbackQuery callbackQuery, TgUserDto tgUserDto) throws TelegramApiException {
         String data = callbackQuery.getData();
         String chatId = callbackQuery.getMessage().getChatId().toString();
 
@@ -56,22 +64,49 @@ public class CallbackQueryHandlerImpl implements CallbackQueryHandler {
             botStateService.getQuestionSelectedMap()
                     .merge(chatId, selectedQuestionDto, (k, v) -> selectedQuestionDto);
 
-            if (selectedQuestionDto.getPathImage().isEmpty()) {
+            if (selectedQuestionDto.getPathImage() != null) {
                 return botMessageFactory.create(chatId, TypeMessage.QUESTION);
             } else {
                 botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION);
             }
         }
+
         if (data.startsWith(ANSWER_.name())) {
-
+            //TODO реализовать botState в базе
+            if (botStateService.getQuestionSelectedMap().containsKey(chatId)) {
+                if (callbackQuery.getMessage().hasPhoto()) {
+                    longPollingBotService
+                            .execute(answerEditMessageHandler.editSendPhoto(callbackQuery));
+                } else {
+                    return answerEditMessageHandler.editSendMessage(callbackQuery);
+                }
+            } else {
+                return botMessageFactory.create(chatId, TypeMessage.WRONG_SELECTED_QUESTION);
+            }
         }
-        if (data.startsWith(DESCRIPTION_.name())) {
 
-        }
         if (data.startsWith(NEXT_.name())) {
+            List<QuestionDto> questionDtoList = questionService
+                    .getAllByTicketNumber(botStateService.getTicketSelectedMap().get(chatId));
+            int numberNextQuestion = questionDtoList
+                    .indexOf(botStateService.getQuestionSelectedMap().get(chatId)) + 1;
 
+            if (numberNextQuestion < questionDtoList.size()) {
+                QuestionDto nextQuestionDto = questionDtoList.get(numberNextQuestion);
+                botStateService.getQuestionSelectedMap()
+                        .merge(chatId, nextQuestionDto, (k, v) -> nextQuestionDto);
+
+                if (nextQuestionDto.getPathImage() != null) {
+                    longPollingBotService
+                            .execute(answerEditMessageHandler.editSendPhoto(callbackQuery));
+                } else {
+                    return botMessageFactory.create(chatId, TypeMessage.QUESTION);
+                }
+
+            } else {
+                return botMessageFactory.create(chatId, TypeMessage.OUT_OF_QUESTION);
+            }
         }
-
         return null;
     }
 }

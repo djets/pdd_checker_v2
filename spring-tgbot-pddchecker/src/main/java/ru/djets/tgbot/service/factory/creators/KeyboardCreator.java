@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+//TODO уйти от статического класса на интерфейсы
 public class KeyboardCreator {
 
     public static InlineKeyboardMarkup getInlineKeyboardWithSequenceNumbers(
