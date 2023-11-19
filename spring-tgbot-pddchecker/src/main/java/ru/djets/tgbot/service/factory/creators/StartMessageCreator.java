@@ -1,9 +1,7 @@
-package ru.djets.tgbot.service.factory;
+package ru.djets.tgbot.service.factory.creators;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.djets.tgbot.service.keyboard.KeyboardCreator;
 
 @Service
 public class StartMessageCreator implements SendMessageCreator {

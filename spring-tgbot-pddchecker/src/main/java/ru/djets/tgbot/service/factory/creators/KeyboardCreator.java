@@ -1,4 +1,4 @@
-package ru.djets.tgbot.service.keyboard;
+package ru.djets.tgbot.service.factory.creators;
 
 import com.vdurmont.emoji.EmojiParser;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -36,17 +36,19 @@ public class KeyboardCreator {
     public static InlineKeyboardMarkup getInlineKeyboardNextQuestion(
             InlineKeyboardMarkup messageKeyboard,
             int numberSelectedAnswer,
-            boolean correctAnswer
+            int correctAnswer
     ) {
         List<InlineKeyboardButton> keyboardButtons = messageKeyboard.getKeyboard().get(0);
         keyboardButtons
                 .forEach(inlineKeyboardButton -> {
                     int numberButton = Integer.parseInt(inlineKeyboardButton.getText());
                     if (numberButton == numberSelectedAnswer) {
-                        if (correctAnswer) {
-                            inlineKeyboardButton.setText(EmojiParser.parseToUnicode(":white_check_mark:") + " " + numberButton);
+                        if (correctAnswer == numberSelectedAnswer) {
+                            inlineKeyboardButton.setText(EmojiParser
+                                    .parseToUnicode(":white_check_mark:") + " " + numberButton);
                         } else {
-                            inlineKeyboardButton.setText(EmojiParser.parseToUnicode(":x:") + " " + numberButton);
+                            inlineKeyboardButton.setText(EmojiParser
+                                    .parseToUnicode(":x:") + " " + numberButton);
                         }
                     } else {
                         inlineKeyboardButton.setText(String.valueOf(numberButton));

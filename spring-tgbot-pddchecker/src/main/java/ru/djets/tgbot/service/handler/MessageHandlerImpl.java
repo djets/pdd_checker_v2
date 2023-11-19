@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.djets.tgbot.dto.TgUserDto;
+import ru.djets.tgbot.enums.TypeMessage;
+import ru.djets.tgbot.service.factory.BotMessageFactory;
 import ru.djets.tgbot.service.model.TgUserService;
-import ru.djets.tgbot.service.processors.AnswerPostProcessor;
+import ru.djets.tgbot.service.BotStateService;
 
 @Slf4j
 @Service
@@ -17,9 +19,11 @@ import ru.djets.tgbot.service.processors.AnswerPostProcessor;
 @RequiredArgsConstructor
 public class MessageHandlerImpl implements MessageHandler {
 
-    AnswerPostProcessor answerPostProcessor;
+    BotStateService botStateService;
 
     TgUserService tgUserService;
+
+    BotMessageFactory botMessageFactory;
 
     @Override
     public BotApiMethod<?> handle(Message message, TgUserDto tgUserDto) {
@@ -33,16 +37,16 @@ public class MessageHandlerImpl implements MessageHandler {
         switch (messageText) {
             case null -> throw new RuntimeException("empty messages text");
             case "/start" -> {
-                return null;
+                return botMessageFactory.create(chatId, TypeMessage.START);
             }
             case "вернутся к вопросам" -> {
-                if (answerPostProcessor.getTicketSelectedMap().containsKey(chatId)) {
-                    return null;
+                if (botStateService.getTicketSelectedMap().containsKey(chatId)) {
+                    return botMessageFactory.create(chatId, TypeMessage.TICKET_QUESTIONS);
                 }
-                return null;
+                return botMessageFactory.create(chatId, TypeMessage.WRONG_SELECTED_TICKET);
             }
             case "выбор билета" -> {
-                return null;
+                return botMessageFactory.create(chatId, TypeMessage.TICKETS);
             }
             default -> throw new IllegalStateException("Unexpected value: " + messageText);
         }

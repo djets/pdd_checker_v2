@@ -1,9 +1,10 @@
 package ru.djets.tgbot.enums;
 
 public enum TypeMessage {
-    START_,
-    ERROR_,
-    BACK_TO_QUESTIONS_,
-    ALL_TICKETS,
-    SELECT_TICKET_
+    START,
+    TICKETS,
+    TICKET_QUESTIONS,
+    QUESTION,
+    WRONG_SELECTED_TICKET,
+    WRONG_SELECTED_QUESTION
 }

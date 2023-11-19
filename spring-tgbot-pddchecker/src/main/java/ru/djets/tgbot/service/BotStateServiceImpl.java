@@ -1,4 +1,4 @@
-package ru.djets.tgbot.service.processors;
+package ru.djets.tgbot.service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +14,10 @@ import java.util.Map;
 @Setter
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class AnswerPostProcessorImpl implements AnswerPostProcessor {
+public class BotStateServiceImpl implements BotStateService {
 
-    Map<Long, Integer> ticketSelectedMap = new HashMap<>();
-    Map<Long, QuestionDto> questionsSelectedMap = new HashMap<>();
+    Map<String, Integer> ticketSelectedMap = new HashMap<>();
+    Map<String, QuestionDto> questionSelectedMap = new HashMap<>();
 
     @Override
     public boolean isCorrectAnswer(int numberSelectedAnswer, QuestionDto questionDto) {
@@ -28,12 +28,11 @@ public class AnswerPostProcessorImpl implements AnswerPostProcessor {
     }
 
     @Override
-    public Map<Long, Integer> getTicketSelectedMap() {
+    public Map<String, Integer> getTicketSelectedMap() {
         return this.ticketSelectedMap;
     }
 
-    @Override
-    public Map<Long, QuestionDto> getQuestionsSelectedMap() {
-        return this.questionsSelectedMap;
+    public Map<String, QuestionDto> getQuestionSelectedMap() {
+        return this.questionSelectedMap;
     }
 }

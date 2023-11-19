@@ -1,4 +1,4 @@
-package ru.djets.tgbot.service.factory;
+package ru.djets.tgbot.service.factory.creators;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.djets.tgbot.enums.CallbackPrefix;
-import ru.djets.tgbot.service.keyboard.KeyboardCreator;
 import ru.djets.tgbot.service.model.QuestionService;
 
 @Service
