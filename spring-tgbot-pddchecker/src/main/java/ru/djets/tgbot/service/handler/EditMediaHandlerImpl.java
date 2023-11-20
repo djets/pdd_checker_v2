@@ -13,18 +13,19 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import ru.djets.tgbot.dto.QuestionDto;
 import ru.djets.tgbot.enums.CallbackPrefix;
 import ru.djets.tgbot.service.BotStateService;
+import ru.djets.tgbot.service.factory.creators.InlineKeyboardsCreator;
 
 import java.util.Comparator;
 import java.util.List;
 
-import static ru.djets.tgbot.service.factory.creators.KeyboardCreator.getInlineKeyboardNextQuestion;
-
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class AnswerEditMessageHandlerImpl implements AnswerEditMessageHandler {
+public class EditMediaHandlerImpl implements EditMediaHandler {
 
     BotStateService service;
+
+    InlineKeyboardsCreator inlineKeyboardsCreator;
 
     @Override
     public EditMessageText editSendMessage(CallbackQuery callbackQuery) {
@@ -43,7 +44,7 @@ public class AnswerEditMessageHandlerImpl implements AnswerEditMessageHandler {
         editMessageText.setText(callbackQuery.getMessage().getText() +
                 "\n\n" + questionDto.getDescription());
         editMessageText.setReplyMarkup(
-                getInlineKeyboardNextQuestion(
+                inlineKeyboardsCreator.createInlineKeyboard(
                         messageKeyboard,
                         numberSelectedAnswer,
                         questionDto.getNumberCorrectAnswer()));
@@ -87,7 +88,7 @@ public class AnswerEditMessageHandlerImpl implements AnswerEditMessageHandler {
         editMessageMedia.setMessageId(callbackQuery.getMessage().getMessageId());
 //        editMessageMedia.setMedia(inputMediaPhoto);
         editMessageMedia.setReplyMarkup(
-                getInlineKeyboardNextQuestion(
+                inlineKeyboardsCreator.createInlineKeyboard(
                         messageKeyboard,
                         numberSelectedAnswer,
                         questionDto.getNumberCorrectAnswer()));

@@ -23,6 +23,8 @@ public class QuestionSendPhotoCreator implements SendPhotoCreator {
 
     BotStateService botStateService;
 
+    InlineKeyboardsCreator inlineKeyboardsCreator;
+
     // A question with a keyboard to answer
     @Override
     public SendPhoto createSendPhoto(String chatId) {
@@ -51,7 +53,7 @@ public class QuestionSendPhotoCreator implements SendPhotoCreator {
                                 )
         );
         sendPhoto.setReplyMarkup(
-                KeyboardCreator.getInlineKeyboardWithSequenceNumbers(
+                inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,
                         questionDto.getAnswers().size(),
                         5)

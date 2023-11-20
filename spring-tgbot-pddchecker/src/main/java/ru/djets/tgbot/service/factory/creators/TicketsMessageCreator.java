@@ -15,16 +15,17 @@ public class TicketsMessageCreator implements SendMessageCreator {
 
     QuestionService questionService;
 
+    InlineKeyboardsCreator inlineKeyboardsCreator;
+
     @Override
     public SendMessage createSendMessage(String chatId) {
         return SendMessage.builder()
                 .chatId(chatId)
                 .text("Выберите билет. \n")
-                .replyMarkup(KeyboardCreator
-                        .getInlineKeyboardWithSequenceNumbers(
-                                CallbackPrefix.TICKET_,
-                                questionService.getCountDistinctByTicketNumberExists(),
-                                8))
+                .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
+                        CallbackPrefix.TICKET_,
+                        questionService.getCountDistinctByTicketNumberExists(),
+                        8))
                 .build();
     }
 }

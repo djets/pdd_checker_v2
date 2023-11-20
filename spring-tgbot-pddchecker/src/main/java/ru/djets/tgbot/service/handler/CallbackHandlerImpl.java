@@ -25,7 +25,7 @@ import static ru.djets.tgbot.enums.CallbackPrefix.*;
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class CallbackQueryHandlerImpl implements CallbackQueryHandler {
+public class CallbackHandlerImpl implements CallbackHandler {
 
     BotStateService botStateService;
 
@@ -35,7 +35,7 @@ public class CallbackQueryHandlerImpl implements CallbackQueryHandler {
 
     BotObjectFactory<SendPhoto, TypeSendPhoto, String> botSendPhotoFactory;
 
-    AnswerEditMessageHandler answerEditMessageHandler;
+    EditMediaHandler editMediaHandler;
 
     LongPollingBotService longPollingBotService;
 
@@ -76,9 +76,9 @@ public class CallbackQueryHandlerImpl implements CallbackQueryHandler {
             if (botStateService.getQuestionSelectedMap().containsKey(chatId)) {
                 if (callbackQuery.getMessage().hasPhoto()) {
                     longPollingBotService
-                            .execute(answerEditMessageHandler.editSendPhoto(callbackQuery));
+                            .execute(editMediaHandler.editSendPhoto(callbackQuery));
                 } else {
-                    return answerEditMessageHandler.editSendMessage(callbackQuery);
+                    return editMediaHandler.editSendMessage(callbackQuery);
                 }
             } else {
                 return botMessageFactory.create(chatId, TypeMessage.WRONG_SELECTED_QUESTION);
@@ -98,7 +98,7 @@ public class CallbackQueryHandlerImpl implements CallbackQueryHandler {
 
                 if (nextQuestionDto.getPathImage() != null) {
                     longPollingBotService
-                            .execute(answerEditMessageHandler.editSendPhoto(callbackQuery));
+                            .execute(editMediaHandler.editSendPhoto(callbackQuery));
                 } else {
                     return botMessageFactory.create(chatId, TypeMessage.QUESTION);
                 }

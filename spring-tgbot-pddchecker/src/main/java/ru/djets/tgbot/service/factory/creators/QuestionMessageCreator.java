@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 public class QuestionMessageCreator implements SendMessageCreator {
 
     BotStateService botStateService;
+
+    InlineKeyboardsCreator inlineKeyboardsCreator;
     // A question with a keyboard to answer
     @Override
     public SendMessage createSendMessage(String chatId) {
@@ -29,7 +31,7 @@ public class QuestionMessageCreator implements SendMessageCreator {
                         questionDto.getAnswers().stream()
                                 .map(answer -> numberOfObject.getAndIncrement() + ". " + answer)
                                 .collect(Collectors.joining("\n")))
-                .replyMarkup(KeyboardCreator.getInlineKeyboardWithSequenceNumbers(
+                .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,
                         questionDto.getAnswers().size(),
                         5))

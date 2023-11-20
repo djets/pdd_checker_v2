@@ -17,17 +17,19 @@ public class TicketQuestionsMessageCreator implements SendMessageCreator {
     QuestionService questionService;
 
     BotStateService postProcessor;
+
+    InlineKeyboardsCreator inlineKeyboardsCreator;
+
     @Override
     public SendMessage createSendMessage(String chatId) {
         Integer numberSelectedTicked = postProcessor.getTicketSelectedMap().get(chatId);
         return SendMessage.builder()
                 .chatId(chatId)
                 .text("Вопросы билета " + numberSelectedTicked + ". \n")
-                .replyMarkup(KeyboardCreator
-                        .getInlineKeyboardWithSequenceNumbers(
-                                CallbackPrefix.QUESTION_,
-                                questionService.getCountAllByTicketNumber(numberSelectedTicked),
-                                5))
+                .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
+                        CallbackPrefix.QUESTION_,
+                        questionService.getCountAllByTicketNumber(numberSelectedTicked),
+                        5))
                 .build();
     }
 }

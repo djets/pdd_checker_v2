@@ -1,6 +1,7 @@
 package ru.djets.tgbot.service.factory.creators;
 
 import com.vdurmont.emoji.EmojiParser;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -13,10 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//TODO уйти от статического класса на интерфейсы
-public class KeyboardCreator {
+@Service
+public class KeyboardCreator implements InlineKeyboardsCreator, ReplyKeyboardMarkupCreator{
 
-    public static InlineKeyboardMarkup getInlineKeyboardWithSequenceNumbers(
+    public InlineKeyboardMarkup createInlineKeyboard(
             CallbackPrefix callbackPrefix,
             int numberOfButtons,
             int maxSizeRow
@@ -34,7 +35,7 @@ public class KeyboardCreator {
         return inlineKeyboardMarkup;
     }
 
-    public static InlineKeyboardMarkup getInlineKeyboardNextQuestion(
+    public InlineKeyboardMarkup createInlineKeyboard(
             InlineKeyboardMarkup messageKeyboard,
             int numberSelectedAnswer,
             int correctAnswer
@@ -62,7 +63,7 @@ public class KeyboardCreator {
         return messageKeyboard;
     }
 
-    public static ReplyKeyboardMarkup getMainReplyKeyboard() {
+    public ReplyKeyboardMarkup createReplyKeyboardMarkup() {
         KeyboardRow row = new KeyboardRow(2);
         row.add(KeyboardButton.builder().text("вернутся к вопросам").build());
         row.add(KeyboardButton.builder().text("выбор билета").build());
@@ -75,7 +76,7 @@ public class KeyboardCreator {
                 .build();
     }
 
-    private static List<List<Integer>> getListNumberOfSize(int numberOfButtons, int maxSizeRow) {
+    private List<List<Integer>> getListNumberOfSize(int numberOfButtons, int maxSizeRow) {
         List<List<Integer>> rowList = new ArrayList<>();
         if ((double) numberOfButtons / maxSizeRow >= 1) {
             for (int i = 1; i <= numberOfButtons / maxSizeRow; i++) {

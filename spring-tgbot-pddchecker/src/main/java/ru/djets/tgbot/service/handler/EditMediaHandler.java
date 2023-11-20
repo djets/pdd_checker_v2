@@ -4,7 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMe
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
-public interface AnswerEditMessageHandler {
+public interface EditMediaHandler {
     //Create reaction on Answer in SendMessage
     EditMessageText editSendMessage (CallbackQuery callbackQuery);
     //Create reaction on Answer in SendPhoto

@@ -3,6 +3,7 @@ package ru.djets.tgbot.service;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.starter.SpringWebhookBot;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WebhookBotService extends SpringWebhookBot {
 
@@ -18,6 +20,8 @@ public class WebhookBotService extends SpringWebhookBot {
     String botPath;
     String botUsername;
     String botToken;
+
+    BotProcessor botProcessor;
     
     public WebhookBotService(SetWebhook setWebhook) {
         super(setWebhook);
@@ -25,6 +29,6 @@ public class WebhookBotService extends SpringWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return null;
+        return botProcessor.exUpdate(update);
     }
 }
