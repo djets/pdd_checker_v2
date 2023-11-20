@@ -1,6 +1,6 @@
 spring:
-  application:
-    name:ppd_check
+#  application:
+#    name:ppd_check
   datasource:
     url: jdbc:postgresql://localhost:5430/pdd-db
     username: pdd-user
