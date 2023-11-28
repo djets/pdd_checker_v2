@@ -40,7 +40,7 @@ services:
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
 #      - ../2. Init Database:/docker-entrypoint-initdb.d
-      - .:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5430:5432"
     healthcheck:
@@ -58,26 +58,22 @@ services:
     networks:
       - postgres
 
-#  pgadmin:
-#    container_name: pgadmin_container
-#    image: dpage/pgadmin4:5.7
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: "pdd-check-user@pdd-chek.com"
-#      PGADMIN_DEFAULT_PASSWORD: "pgpwd-adm-check"
-#      PGADMIN_CONFIG_SERVER_MODE: "False"
-#    volumes:
-#      - ./pgadmin:/var/lib/pgadmin
-#    ports:
-#      - "5050:80"
-#    restart: "no"
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '0.5'
-#          memory: 1G
-#    networks:
-#      - postgres
+  redis:
+    image: redis:7.2-rc2
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass qwerty12345678
+    ports:
+      - '6379:6379'
+    networks:
+      - postgres
 
 networks:
   postgres:
     driver: bridge
+#    ipam:
+#      driver: bridge
+#      config:
+#        - subnet: 172.77.1.0/26
+
+
+

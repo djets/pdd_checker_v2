@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>spring-tgbot-pddchecker</module>
+        <module>tgbot-pddchecker</module>
+        <module>web-ppdchecker-client</module>
     </modules>
 </project>
