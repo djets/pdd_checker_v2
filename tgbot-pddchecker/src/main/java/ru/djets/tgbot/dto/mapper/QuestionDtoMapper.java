@@ -1,30 +1,56 @@
 package ru.djets.tgbot.dto.mapper;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
+import ru.djets.tgbot.dao.entity.Question;
 import ru.djets.tgbot.dto.QuestionDto;
-import ru.djets.tgbot.model.Answer;
-import ru.djets.tgbot.model.Question;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class QuestionDtoMapper implements DtoMapper<Question, QuestionDto> {
+
+    AnswerDtoMapper answerDtoMapper;
 
     @Override
     public QuestionDto toDo(Question question) {
-        return new QuestionDto()
-                .setId(question.getId().toString())
-                .setQuestionText(question.getTextQuestion())
-                .setDescription(question.getDescription())
-                .setPathImage(question.getPathImage())
-                .setTicketNumber(question.getTicketNumber())
-                .setNumberCorrectAnswer(question.getNumberCorrectAnswer())
-                .setAnswers(List.copyOf(question.getAnswer().stream().map(Answer::getAnswerText).toList())
-        );
+        QuestionDto questionDto = new QuestionDto();
+        questionDto.setId(question.getId().toString());
+        questionDto.setTextQuestion(question.getTextQuestion());
+        questionDto.setDescription(question.getDescription());
+        questionDto.setPathImage(question.getPathImage());
+        questionDto.setTicketNumber(question.getTicketNumber());
+        questionDto.setNumberCorrectAnswer(question.getNumberCorrectAnswer());
+        questionDto.setAnswers(
+                List.copyOf(question.getAnswer()
+                        .stream()
+                        .map(answerDtoMapper::toDo)
+                        .toList()));
+        questionDto.setVersion(question.getVersion());
+        return questionDto;
     }
 
     @Override
     public Question fromDo(QuestionDto questionDto) {
-        return null;
+        Question question = new Question()
+                .setTextQuestion(questionDto.getTextQuestion())
+                .setDescription(questionDto.getDescription())
+                .setPathImage(questionDto.getPathImage())
+                .setTicketNumber(questionDto.getTicketNumber())
+                .setNumberCorrectAnswer(questionDto.getNumberCorrectAnswer())
+                .setAnswer(
+                        questionDto.getAnswers() != null ? List.copyOf(
+                                questionDto.getAnswers()
+                                .stream()
+                                .map(answerDtoMapper::fromDo)
+                                .toList()) : null);
+        question.setId(questionDto.getId() != null ? UUID.fromString(questionDto.getId()) : null);
+        question.setVersion(questionDto.getVersion());
+        return question;
     }
 }

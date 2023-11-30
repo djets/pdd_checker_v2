@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Accessors(chain = true)
@@ -17,7 +18,7 @@ public class QuestionDto {
 
     private int ticketNumber, numberCorrectAnswer;
 
-    private List<AnswerDto> answers;
+    private List<AnswerDto> answers = new ArrayList<>();
 
     private Long version;
 

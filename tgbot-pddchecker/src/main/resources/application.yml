@@ -5,20 +5,8 @@ spring:
     password: pgpwd
 
   jpa:
-    show-sql: true
+    show-sql: false
     generate-ddl: false
 
-  flyway:
-    baseline-description: "<<Flyway initial migration>>"
-    locations: db/migration
-    url: jdbc:postgresql://localhost:5430/pdd-db
-    user: pdd-user
-    password: pgpwd
-    enabled: true
-    baseline-on-migrate: true
-
 telegram:
-  api-url: "https://api.telegram.org"
-  bot-username: "@ppdcheck_testbot"
-#  bot-token-path: "./data_load/token"
-  bot-token-path: "5827939856:AAFSckZms6hqj7bZ2Jq7dM9bWEbeF_iC4MI"
+  bot-name: "@ppdcheck_testbot"

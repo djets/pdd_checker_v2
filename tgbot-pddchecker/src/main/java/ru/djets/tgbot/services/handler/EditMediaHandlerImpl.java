@@ -69,10 +69,15 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
                 .map(PhotoSize::getFileId)
                 .map(InputMediaPhoto::new)
                 .toList();
-        inputMediaPhotos.stream()
-                .findFirst()
-                .orElseThrow()
-                .setCaption(caption + "\n\n" + questionDto.getDescription());
+        inputMediaPhotos
+                .forEach(inputMediaPhoto ->
+                        inputMediaPhoto.setCaption(caption +
+                                "\n\n" + questionDto.getDescription()));
+
+//        inputMediaPhotos.stream()
+//                .findFirst()
+//                .orElseThrow()
+//                .setCaption(caption + "\n\n" + questionDto.getDescription());
 //                .findFirst().findFirst()
 //        String fileId = photos.stream()
 //                .sorted(Comparator.comparing(PhotoSize::getFileSize).reversed())

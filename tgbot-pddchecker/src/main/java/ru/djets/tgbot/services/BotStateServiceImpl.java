@@ -17,6 +17,7 @@ import java.util.Map;
 public class BotStateServiceImpl implements BotStateService {
 
     Map<String, Integer> ticketSelectedMap = new HashMap<>();
+
     Map<String, QuestionDto> questionSelectedMap = new HashMap<>();
 
     @Override

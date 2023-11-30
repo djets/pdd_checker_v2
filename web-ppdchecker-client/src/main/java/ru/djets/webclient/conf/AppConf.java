@@ -3,6 +3,7 @@ package ru.djets.webclient.conf;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,17 +12,21 @@ import ru.djets.webclient.services.WebErrorHandler;
 import ru.djets.webclient.utils.DataTemplateLoader;
 
 @Configuration
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class AppConf {
 
-    WebErrorHandler webErrorHandler;
+    final WebErrorHandler webErrorHandler;
 
-    QuestionJpaRepository questionJpaRepository;
+    final QuestionJpaRepository questionJpaRepository;
+
+    @Value("${telegram.api-url}")
+    String apiUrl;
 
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
+                .baseUrl(apiUrl)
                 .filter(webErrorHandler.errorHandler())
                 .build();
     }

@@ -4,14 +4,16 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Accessors(chain = true)
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TgUserDto {
 
-    String name, lastName;
+    String id, name, lastName;
 
-    long tgId;
+    Long tgId;
 }

@@ -20,9 +20,6 @@ spring:
 
   flyway:
     baseline-description: "<<Flyway initial migration>>"
-#    url: jdbc:postgresql://localhost:5430/pdd-db
-#    user: pdd-user
-#    password: pgpwd
     locations: db/migration
     enabled: true
     baseline-on-migrate: true
@@ -31,8 +28,6 @@ spring:
 
 telegram:
   api-url: "https://api.telegram.org"
-  bot-username: "@ppdcheck_testbot"
-  bot-token-path: "./data_load/token"
 
 ---
 spring:

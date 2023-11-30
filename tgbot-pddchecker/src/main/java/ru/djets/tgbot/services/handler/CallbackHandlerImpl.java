@@ -9,14 +9,13 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.djets.tgbot.dao.services.QuestionService;
 import ru.djets.tgbot.dto.QuestionDto;
-import ru.djets.tgbot.dto.TgUserDto;
 import ru.djets.tgbot.enums.TypeMessage;
 import ru.djets.tgbot.enums.TypeSendPhoto;
 import ru.djets.tgbot.services.BotStateService;
 import ru.djets.tgbot.services.LongPollingBotService;
 import ru.djets.tgbot.services.factory.BotObjectFactory;
-import ru.djets.tgbot.services.model.QuestionService;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
     LongPollingBotService longPollingBotService;
 
     @Override
-    public BotApiMethod<?> handle(CallbackQuery callbackQuery, TgUserDto tgUserDto) throws TelegramApiException {
+    public BotApiMethod<?> handle(CallbackQuery callbackQuery) throws TelegramApiException {
         String data = callbackQuery.getData();
         String chatId = callbackQuery.getMessage().getChatId().toString();
 
@@ -65,9 +64,10 @@ public class CallbackHandlerImpl implements CallbackHandler {
                     .merge(chatId, selectedQuestionDto, (k, v) -> selectedQuestionDto);
 
             if (selectedQuestionDto.getPathImage() != null) {
-                return botMessageFactory.create(chatId, TypeMessage.QUESTION);
+                longPollingBotService.execute(
+                        botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION));
             } else {
-                botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION);
+                return botMessageFactory.create(chatId, TypeMessage.QUESTION);
             }
         }
 
@@ -98,7 +98,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
 
                 if (nextQuestionDto.getPathImage() != null) {
                     longPollingBotService
-                            .execute(editMediaHandler.editSendPhoto(callbackQuery));
+                            .execute(botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION));
                 } else {
                     return botMessageFactory.create(chatId, TypeMessage.QUESTION);
                 }

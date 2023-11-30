@@ -2,11 +2,14 @@ package ru.djets.webclient.views.list;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -14,9 +17,14 @@ import com.vaadin.flow.router.Route;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import ru.djets.webclient.dao.entity.BotSettings;
+import ru.djets.webclient.dao.services.BotSettingsService;
 import ru.djets.webclient.dao.services.QuestionService;
 import ru.djets.webclient.dto.QuestionDto;
+import ru.djets.webclient.services.TelegramBotRegistrationService;
 import ru.djets.webclient.views.form.QuestionForm;
+
+import java.util.List;
 
 @PageTitle("Questions")
 @Route("")
@@ -26,20 +34,35 @@ public class QuestionListView extends VerticalLayout {
 
     final QuestionService questionService;
 
+    final BotSettingsService botSettingsService;
+
+    final TelegramBotRegistrationService registrationService;
+
     final Grid<QuestionDto> grid = new Grid<>(QuestionDto.class, false);
 
     final TextField filterText = new TextField();
-    private QuestionForm form;
+
+    final TextField botName = new TextField();
+
+    final TextField botToken = new TextField();
+
+    final Select<Integer> select = new Select<>();
+    QuestionForm form;
 
     public QuestionListView(
-            QuestionService questionService) {
+            QuestionService questionService,
+            BotSettingsService botSettingsService,
+            TelegramBotRegistrationService registrationService
+    ) {
         this.questionService = questionService;
+        this.botSettingsService = botSettingsService;
+        this.registrationService = registrationService;
         addClassName("questions-view");
         setSizeFull();
         configureGrid();
         configureForm();
 
-        add(getToolbar(), getContent());
+        add(getBotLayout(), getToolbar(), getContent());
         updateQuestions();
         closeEditor();
     }
@@ -64,7 +87,6 @@ public class QuestionListView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassName("questionDto-grid");
         grid.setSizeFull();
-//        grid.setColumns();
         grid.addColumn(QuestionDto::getTextQuestion).setHeader("Текст вопроса");
         grid.addComponentColumn(questionDto -> createHasPhotoIcon(
                 questionDto.getPathImage() != null)).setHeader("Картинка");
@@ -79,6 +101,14 @@ public class QuestionListView extends VerticalLayout {
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         grid.asSingleSelect().addValueChangeListener(event ->
                 editQuestion(event.getValue()));
+
+        select.setItems(questionService.findAll()
+                .stream()
+                .map(QuestionDto::getTicketNumber)
+                .distinct()
+                .sorted()
+                .toList()
+        );
     }
 
     private HorizontalLayout getToolbar() {
@@ -88,12 +118,44 @@ public class QuestionListView extends VerticalLayout {
         filterText.addValueChangeListener(e -> updateQuestions());
         filterText.setWidth("25em");
 
+        botName.setPlaceholder("bot name...");
+        botToken.setPlaceholder("bot token...");
+
+        select.setEmptySelectionAllowed(true);
+        select.addValueChangeListener(e -> updateQuestions());
+
         Button addQuestion = new Button("Добавить вопрос");
         addQuestion.addClickListener(click -> addQuestion());
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, addQuestion);
+        HorizontalLayout toolbar = new HorizontalLayout(select, filterText, addQuestion);
         toolbar.addClassName("toolbar");
+        toolbar.setJustifyContentMode(JustifyContentMode.CENTER);
         return toolbar;
+    }
+
+    private HorizontalLayout getBotLayout() {
+        HorizontalLayout botLayout = new HorizontalLayout();
+
+        Button registrationButton = new Button("Зарегистрировать бота");
+        registrationButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        registrationButton.addClickListener(e -> {
+            String registered;
+            BotSettings botSettings = botSettingsService.findByBotName(botName.getValue());
+            if (botSettings != null) {
+                botSettings.setBotToken(botToken.getValue());
+                registered = registrationService.registered(botSettingsService.save(botSettings));
+            } else {
+                registered = registrationService.registered(
+                        botSettingsService.save(
+                                new BotSettings()
+                                        .setBotName(botName.getValue())
+                                        .setBotToken(botToken.getValue())));
+            }
+            Notification.show(registered);
+        });
+        botLayout.add(registrationButton, botName, botToken);
+        botLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        return botLayout;
     }
 
     private void editQuestion(QuestionDto questionDto) {
@@ -152,8 +214,20 @@ public class QuestionListView extends VerticalLayout {
     }
 
     private void updateQuestions() {
-        grid.setItems(questionService
-                .searchQuestionByTextQuestionContaining(filterText.getValue()));
+        if (select.getValue() != null) {
+            log.info("filtered ticket: {}", select.getValue());
+            List<QuestionDto> allQuestionDtoByTicketNumber = questionService.getAllByTicketNumber(select.getValue());
+            grid.setItems(allQuestionDtoByTicketNumber
+                    .stream()
+                    .filter(questionDto -> questionDto.getTextQuestion().contains(filterText.getValue()))
+                    .toList());
+        } else {
+            List<QuestionDto> allQuestionDto = questionService.findAll();
+            grid.setItems(allQuestionDto
+                    .stream()
+                    .filter(questionDto -> questionDto.getTextQuestion().contains(filterText.getValue()))
+                    .toList());
+        }
     }
 }
 

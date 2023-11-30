@@ -1,29 +1,37 @@
 package ru.djets.tgbot.conf;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
-import ru.djets.tgbot.repositories.QuestionJpaRepository;
+import ru.djets.tgbot.dao.entity.BotSettings;
+import ru.djets.tgbot.dao.repositories.QuestionRepository;
+import ru.djets.tgbot.dao.services.BotSettingsService;
 import ru.djets.tgbot.services.WebhookBotService;
-import ru.djets.tgbot.utils.DataTemplateLoader;
 
+@Getter
 @Configuration
-@EnableConfigurationProperties(BotConfig.class)
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class AppConfig {
 
-    BotConfig botConfig;
+    final BotSettingsService botSettingsService;
 
-    QuestionJpaRepository questionJpaRepository;
+    final QuestionRepository questionRepository;
+
+    @Value("${telegram.bot-name}")
+    String botName;
 
     @Bean
     public SetWebhook getSetWebhook() {
-        return SetWebhook.builder().url(botConfig.getBotPath()).build();
+        BotSettings botSettings = botSettingsService.findByBotName(botName);
+        return SetWebhook.builder()
+                .url(botSettings.getBotPath())
+                .build();
     }
 
     @Bean
@@ -31,9 +39,4 @@ public class AppConfig {
         return new WebhookBotService(setWebhook);
     }
 
-    @Bean
-    public void dataTemplateLoader () {
-        DataTemplateLoader dataTemplateLoader = new DataTemplateLoader(questionJpaRepository);
-        dataTemplateLoader.createQuestion(10);
-    }
 }

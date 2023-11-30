@@ -45,10 +45,10 @@ public class QuestionSendPhotoCreator implements SendPhotoCreator {
 
         sendPhoto.setChatId(chatId);
         sendPhoto.setCaption(
-                questionDto.getQuestionText() + "\n" +
+                questionDto.getTextQuestion() + "\n" +
                         questionDto.getAnswers().stream()
                                 .map(answer -> numberOfObject.getAndIncrement() +
-                                        ". " + answer)
+                                        ". " + answer.getAnswerText())
                                 .collect(Collectors.joining("\n")
                                 )
         );

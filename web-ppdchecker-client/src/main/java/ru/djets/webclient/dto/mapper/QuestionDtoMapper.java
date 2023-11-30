@@ -24,7 +24,7 @@ public class QuestionDtoMapper implements DtoMapper<Question, QuestionDto> {
         questionDto.setTextQuestion(question.getTextQuestion());
         questionDto.setDescription(question.getDescription());
         questionDto.setPathImage(question.getPathImage());
-        questionDto.setTextQuestion(question.getTextQuestion());
+        questionDto.setTicketNumber(question.getTicketNumber());
         questionDto.setNumberCorrectAnswer(question.getNumberCorrectAnswer());
         questionDto.setAnswers(
                 List.copyOf(question.getAnswer()

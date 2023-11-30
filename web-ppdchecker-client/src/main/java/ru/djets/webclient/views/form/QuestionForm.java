@@ -7,73 +7,109 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 import lombok.extern.slf4j.Slf4j;
 import ru.djets.webclient.dto.AnswerDto;
 import ru.djets.webclient.dto.QuestionDto;
-import ru.djets.webclient.views.list.AnswerListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 public class QuestionForm extends FormLayout {
-
     TextArea textQuestion = new TextArea("Текст вопроса");
     TextArea description = new TextArea("Описание");
-    TextField ticketNumber = new TextField("Номер билет");
+    TextField pathImage = new TextField("Номер билета");
+    TextField ticketNumber = new TextField("Номер билета");
     TextField numberCorrectAnswer = new TextField("Номер правильного ответа");
 
-    VirtualList<AnswerDto> answers = new VirtualList<>();
+    Grid<AnswerDto> answerDtoGrid = new Grid<>(AnswerDto.class, false);
 
-    Button addAnswer = new Button("добавить ответ");
-    Button save = new Button("Save");
-    Button delete = new Button("Delete");
-    Button close = new Button("Cancel");
+    Button save = new Button("Сохранить");
+    Button delete = new Button("Удалить");
+    Button close = new Button("Отмена");
 
     Binder<QuestionDto> binder = new BeanValidationBinder<>(QuestionDto.class);
 
-    AnswerListView answerListView;
+    Button addAnswerButton = new Button("Добавить ответ");
 
     public QuestionForm() {
         addClassName("question-form");
         binder.bindInstanceFields(this);
-
-        textQuestion.setHeight("10em");
-        textQuestion.setReadOnly(false);
-        description.setHeight("10em");
-        description.setReadOnly(false);
-        ticketNumber.setWidth("2em");
-        ticketNumber.setReadOnly(false);
-        numberCorrectAnswer.setWidth("2em");
-        numberCorrectAnswer.setReadOnly(false);
-
+        getBlockAnswers();
         add(
                 textQuestion,
                 description,
-                ticketNumber,
-                numberCorrectAnswer,
-                createServiceButtonsLayout()
+                pathImage,
+                getBlockQuestion(),
+                createQuestionsButtonsLayout()
         );
     }
 
-    private void addContent(List<AnswerDto> answerDtoList) {
-        if (answerDtoList != null) {
-            answerListView = new AnswerListView(answerDtoList);
-//            answerListView.setWidth("25em");
-            add(answerListView);
-        }
+    private Component getBlockQuestion() {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(
+                ticketNumber,
+                numberCorrectAnswer
+        );
+        return horizontalLayout;
     }
 
-    private Component createServiceButtonsLayout() {
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+    private void getBlockAnswers() {
+        Grid.Column<AnswerDto> answerDtoColumn = answerDtoGrid.addColumn(AnswerDto::getAnswerText).setHeader("Ответы");
+        answerDtoGrid.getColumns().forEach(col -> col.setAutoWidth(true));
+        answerDtoGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+
+        Editor<AnswerDto> editor = answerDtoGrid.getEditor();
+
+        Grid.Column<AnswerDto> editAnswerDtoColumn = answerDtoGrid.addComponentColumn(answerDto -> {
+            Button editButton = new Button("edit");
+            editButton.addClickListener(e -> {
+                if (editor.isOpen()) {
+                    editor.cancel();
+                }
+                answerDtoGrid.getEditor().editItem(answerDto);
+            });
+            return editButton;
+        });
+
+        Binder<AnswerDto> answerDtoBinder = new Binder<>(AnswerDto.class);
+        editor.setBinder(answerDtoBinder);
+        editor.setBuffered(true);
+
+        TextField answerTextField = new TextField();
+        answerTextField.setWidthFull();
+        answerDtoBinder.forField(answerTextField)
+                .asRequired("Ответ не может быть пустым")
+                .bind(AnswerDto::getAnswerText, AnswerDto::setAnswerText);
+        answerDtoColumn.setEditorComponent(answerTextField);
+
+        Button saveButton = new Button("save", e -> editor.save());
+
+        Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
+                e -> editor.cancel());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR);
+        HorizontalLayout actions = new HorizontalLayout(saveButton,
+                cancelButton);
+        actions.setPadding(false);
+        editAnswerDtoColumn.setEditorComponent(actions);
+    }
+
+    private Component createQuestionsButtonsLayout() {
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        addAnswerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
@@ -83,7 +119,17 @@ public class QuestionForm extends FormLayout {
         close.addClickListener(event -> fireEvent(new QuestionCloseEvent(this)));
 
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
-        return new HorizontalLayout(save, delete, close);
+
+        addAnswerButton.addClickListener(event -> {
+            List<AnswerDto> copyAnswersDto = new ArrayList<>(binder.getBean().getAnswers());
+            copyAnswersDto.add(new AnswerDto());
+            binder.getBean().setAnswers(copyAnswersDto);
+            updateAnswer();
+        });
+        HorizontalLayout horizontalLayout = new HorizontalLayout(save, delete, close, addAnswerButton);
+        horizontalLayout.setPadding(true);
+        horizontalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        return horizontalLayout;
     }
 
     private void validateAndSave() {
@@ -97,9 +143,14 @@ public class QuestionForm extends FormLayout {
         if (questionDto != null) {
             log.info("select question: {}", binder.getBean().getId());
             if (questionDto.getAnswers() != null) {
-                addContent(questionDto.getAnswers());
+                updateAnswer();
+                add(answerDtoGrid);
             }
         }
+    }
+
+    private void updateAnswer() {
+        answerDtoGrid.setItems(binder.getBean().getAnswers());
     }
 
     //Events

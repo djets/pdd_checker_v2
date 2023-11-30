@@ -5,31 +5,32 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.djets.webclient.conf.BotConfig;
+import ru.djets.webclient.dao.entity.BotSettings;
+import ru.djets.webclient.dao.services.BotSettingsService;
 
 @Service
-@EnableConfigurationProperties(BotConfig.class)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Slf4j
 public class TelegramBotRegistrationServiceImpl implements TelegramBotRegistrationService {
 
-//    BotConfig botConfig;
+    BotSettingsService botSettingsService;
 
     WebClient webClient;
 
     NgrokClientService ngrokClientService;
 
     @Override
-    public String registered(String botToken) {
+    public String registered(BotSettings botSettings) {
+        botSettings.setBotPath(ngrokClientService.getBotLocalPath());
+
         String uri = null;
         try {
-        uri = ("/bot" + botToken +
-                "/setWebhook?url=" + ngrokClientService.getBotLocalPath())
+        uri = ("/bot" + botSettings.getBotToken() +
+                "/setWebhook?url=" + botSettings.getBotPath())
                 .replace("%0A", "");
         } catch (NgrokException e) {
             log.warn(e.getMessage());
@@ -44,6 +45,10 @@ public class TelegramBotRegistrationServiceImpl implements TelegramBotRegistrati
                 .bodyToMono(String.class)
                 .block();
         log.info("//// SET URL: " + requestSetUrl);
+
+        botSettings.setStatus(requestSetUrl);
+
+        botSettingsService.save(botSettings);
         return requestSetUrl;
     }
 }

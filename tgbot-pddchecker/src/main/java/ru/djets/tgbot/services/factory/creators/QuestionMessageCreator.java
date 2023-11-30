@@ -27,9 +27,10 @@ public class QuestionMessageCreator implements SendMessageCreator {
         AtomicInteger numberOfObject = new AtomicInteger(1);
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(questionDto.getQuestionText() + "\n" +
+                .text(questionDto.getTextQuestion() + "\n" +
                         questionDto.getAnswers().stream()
-                                .map(answer -> numberOfObject.getAndIncrement() + ". " + answer)
+                                .map(answer -> numberOfObject.getAndIncrement() +
+                                        ". " + answer.getAnswerText())
                                 .collect(Collectors.joining("\n")))
                 .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,

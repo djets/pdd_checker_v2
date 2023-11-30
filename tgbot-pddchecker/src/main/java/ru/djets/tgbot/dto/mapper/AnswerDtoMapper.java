@@ -1,8 +1,8 @@
-package ru.djets.webclient.dto.mapper;
+package ru.djets.tgbot.dto.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.djets.webclient.dao.entity.Answer;
-import ru.djets.webclient.dto.AnswerDto;
+import ru.djets.tgbot.dao.entity.Answer;
+import ru.djets.tgbot.dto.AnswerDto;
 
 import java.util.UUID;
 

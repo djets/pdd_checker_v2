@@ -5,8 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.djets.tgbot.dao.services.QuestionService;
 import ru.djets.tgbot.enums.CallbackPrefix;
-import ru.djets.tgbot.services.model.QuestionService;
+import ru.djets.tgbot.dto.QuestionDto;
 
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -24,7 +25,11 @@ public class TicketsMessageCreator implements SendMessageCreator {
                 .text("Выберите билет. \n")
                 .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.TICKET_,
-                        questionService.getCountQuestionsByTextQuestionIsNotNull(),
+                        (int) questionService.findAll()
+                                .stream()
+                                .map(QuestionDto::getTicketNumber)
+                                .distinct()
+                                .count(),
                         8))
                 .build();
     }

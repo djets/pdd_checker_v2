@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class NgrokClientServiceImpl implements NgrokClientService {
+
     @Override
     public String getBotLocalPath() {
         NgrokClient ngrokClient = new NgrokClient.Builder()

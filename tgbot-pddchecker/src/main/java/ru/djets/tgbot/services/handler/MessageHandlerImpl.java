@@ -7,11 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import ru.djets.tgbot.dto.TgUserDto;
+import ru.djets.tgbot.dao.services.TgUserService;
 import ru.djets.tgbot.enums.TypeMessage;
-import ru.djets.tgbot.services.factory.BotMessageFactory;
-import ru.djets.tgbot.services.model.TgUserService;
 import ru.djets.tgbot.services.BotStateService;
+import ru.djets.tgbot.services.factory.BotMessageFactory;
 
 @Slf4j
 @Service
@@ -26,13 +25,13 @@ public class MessageHandlerImpl implements MessageHandler {
     BotMessageFactory botMessageFactory;
 
     @Override
-    public BotApiMethod<?> handle(Message message, TgUserDto tgUserDto) {
+    public BotApiMethod<?> handle(Message message) {
         String chatId = message.getChatId().toString();
         String messageText = message.getText();
 
-        if(!tgUserService.existTgUserByTgId(tgUserDto.getTgId())) {
-            tgUserService.save(tgUserDto);
-        };
+//        if(!tgUserService.existTgUserByTgId(tgUserDto.getTgId())) {
+//            tgUserService.save(tgUserDto);
+//        }
         // Language must be a set version 17 (Preview) pattern matching for switch
         switch (messageText) {
             case null -> throw new RuntimeException("empty messages text");

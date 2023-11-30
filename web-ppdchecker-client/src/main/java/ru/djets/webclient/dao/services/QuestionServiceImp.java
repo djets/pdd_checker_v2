@@ -5,7 +5,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import ru.djets.webclient.dao.entity.Answer;
 import ru.djets.webclient.dao.entity.Question;
+import ru.djets.webclient.dao.repositories.AnswerRepository;
 import ru.djets.webclient.dao.repositories.QuestionJpaRepository;
 import ru.djets.webclient.dto.QuestionDto;
 import ru.djets.webclient.dto.mapper.DtoMapper;
@@ -19,19 +21,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class QuestionServiceImp implements QuestionService {
 
-    QuestionJpaRepository repository;
+    QuestionJpaRepository questionRepository;
+
+    AnswerRepository answerRepository;
 
     DtoMapper<Question, QuestionDto> dtoMapper;
 
     @Override
     public QuestionDto findById(UUID uuid) {
-        return dtoMapper.toDo(repository.findById(uuid)
+        return dtoMapper.toDo(questionRepository.findById(uuid)
                 .orElseThrow());
     }
 
     @Override
     public List<QuestionDto> getAllByTicketNumber(int ticketNumber) {
-        return repository.findAllByTicketNumber(ticketNumber)
+        return questionRepository.findAllByTicketNumber(ticketNumber)
                 .stream()
                 .map(dtoMapper::toDo)
                 .toList();
@@ -39,17 +43,17 @@ public class QuestionServiceImp implements QuestionService {
 
     @Override
     public int getCountAllByTicketNumber(int ticketNumber) {
-        return repository.countAllByTicketNumber(ticketNumber);
+        return questionRepository.countAllByTicketNumber(ticketNumber);
     }
 
     @Override
     public int getCountQuestionsByTextQuestionIsNotNull() {
-        return repository.countQuestionsByTextQuestionIsNotNull();
+        return questionRepository.countQuestionsByTextQuestionIsNotNull();
     }
 
     @Override
     public List<QuestionDto> findAll() {
-        return repository.findAll()
+        return questionRepository.findAll()
                 .stream()
                 .map(dtoMapper::toDo)
                 .toList();
@@ -60,19 +64,26 @@ public class QuestionServiceImp implements QuestionService {
     public String save(QuestionDto questionDto) {
         Question question = dtoMapper.fromDo(questionDto);
         if (question.getId() != null) {
-            Optional<Question> optionalQuestion = repository.findById(question.getId());
+            Optional<Question> optionalQuestion = questionRepository.findById(question.getId());
             Question questionFromBase = optionalQuestion.orElse(question);
             if (optionalQuestion.isEmpty()) {
-                return repository.save(question).getId().toString();
+                return questionRepository.save(question).getId().toString();
             }
             question.setCreationDate(questionFromBase.getCreationDate());
+            question.getAnswer().forEach(answer -> {
+                if (answer.getId() != null) {
+                    Optional<Answer> optionalAnswer = answerRepository.findById(answer.getId());
+                    optionalAnswer.ifPresent(
+                            value -> answer.setCreationDate(value.getCreationDate()));
+                }
+            });
         }
-        return repository.save(question).getId().toString();
+        return questionRepository.save(question).getId().toString();
     }
 
     @Override
     public List<QuestionDto> searchQuestionByTextQuestionContaining(String searchText) {
-        return repository.searchQuestionByTextQuestionContaining(searchText)
+        return questionRepository.searchQuestionByTextQuestionContaining(searchText)
                 .stream()
                 .map(dtoMapper::toDo)
                 .toList();
@@ -81,6 +92,6 @@ public class QuestionServiceImp implements QuestionService {
     @Transactional
     @Override
     public void deleteQuestion(QuestionDto questionDto) {
-        repository.deleteQuestionById(UUID.fromString(questionDto.getId()));
+        questionRepository.deleteQuestionById(UUID.fromString(questionDto.getId()));
     }
 }

@@ -1,8 +1,8 @@
 package ru.djets.tgbot.dto.mapper;
 
 import org.springframework.stereotype.Component;
+import ru.djets.tgbot.dao.entity.TgUser;
 import ru.djets.tgbot.dto.TgUserDto;
-import ru.djets.tgbot.model.TgUser;
 
 @Component
 public class TgUserDtoMapper implements DtoMapper<TgUser, TgUserDto> {
