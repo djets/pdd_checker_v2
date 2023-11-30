@@ -10,12 +10,12 @@ public class TgUserDtoMapper implements DtoMapper<TgUser, TgUserDto> {
     @Override
     public TgUserDto toDo(TgUser tgUserEntity) {
         return new TgUserDto()
-                .tgId(tgUserEntity.getTgId());
+                .setTgId(tgUserEntity.getTgId());
     }
 
     @Override
     public TgUser fromDo(TgUserDto tgUserDto) {
         return new TgUser()
-                .setTgId(tgUserDto.tgId());
+                .setTgId(tgUserDto.getTgId());
     }
 }
