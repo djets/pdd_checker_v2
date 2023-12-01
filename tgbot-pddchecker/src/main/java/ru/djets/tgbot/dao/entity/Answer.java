@@ -29,6 +29,9 @@ public class Answer extends VersionedAbstractEntity<UUID> {
     @Column(name = "answer_text", nullable = false)
     String answerText;
 
+    @Column(name = "number_answer", nullable = false)
+    int numberAnswer;
+
     @Override
     public UUID getId() {
         return this.id;

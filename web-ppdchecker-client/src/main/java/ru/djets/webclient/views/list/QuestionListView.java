@@ -85,18 +85,15 @@ public class QuestionListView extends VerticalLayout {
     }
 
     private void configureGrid() {
+
         grid.addClassName("questionDto-grid");
         grid.setSizeFull();
+        grid.addColumn(QuestionDto::getNumberQuestion).setHeader("N").setSortable(true);
         grid.addColumn(QuestionDto::getTextQuestion).setHeader("Текст вопроса");
         grid.addComponentColumn(questionDto -> createHasPhotoIcon(
-                questionDto.getPathImage() != null)).setHeader("Картинка");
-//        grid.addColumn(questionDto -> questionDto.getAnswers()
-//                .stream()
-//                .map(answerDto ->
-//                        questionDto.getAnswers().indexOf(answerDto) + 1 +
-//                                ". " + answerDto.getAnswerText())
-//                .collect(Collectors.joining("\n"))
-//        ).setHeader("Ответы");
+                questionDto.getPathImage() != null &&
+                        !questionDto.getPathImage().isEmpty()))
+                .setHeader("Картинка");
         grid.addColumn(QuestionDto::getNumberCorrectAnswer).setHeader("Правильный ответ");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         grid.asSingleSelect().addValueChangeListener(event ->

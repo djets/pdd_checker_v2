@@ -24,8 +24,9 @@ public class QuestionDtoMapper implements DtoMapper<Question, QuestionDto> {
         questionDto.setTextQuestion(question.getTextQuestion());
         questionDto.setDescription(question.getDescription());
         questionDto.setPathImage(question.getPathImage());
-        questionDto.setTicketNumber(question.getTicketNumber());
+        questionDto.setNumberQuestion(question.getNumberQuestion());
         questionDto.setNumberCorrectAnswer(question.getNumberCorrectAnswer());
+        questionDto.setTicketNumber(question.getTicketNumber());
         questionDto.setAnswers(
                 List.copyOf(question.getAnswer()
                         .stream()
@@ -37,15 +38,16 @@ public class QuestionDtoMapper implements DtoMapper<Question, QuestionDto> {
 
     @Override
     public Question fromDo(QuestionDto questionDto) {
-        Question question = new Question()
-                .setTextQuestion(questionDto.getTextQuestion())
-                .setDescription(questionDto.getDescription())
-                .setPathImage(questionDto.getPathImage())
-                .setTicketNumber(questionDto.getTicketNumber())
-                .setNumberCorrectAnswer(questionDto.getNumberCorrectAnswer())
-                .setAnswer(
-                        questionDto.getAnswers() != null ? List.copyOf(
-                                questionDto.getAnswers()
+        Question question = new Question();
+        question.setTextQuestion(questionDto.getTextQuestion());
+        question.setDescription(questionDto.getDescription());
+        question.setPathImage(questionDto.getPathImage());
+        question.setNumberQuestion(questionDto.getNumberQuestion());
+        question.setNumberCorrectAnswer(questionDto.getNumberCorrectAnswer());
+        question.setTicketNumber(questionDto.getTicketNumber());
+        question.setAnswer(
+                questionDto.getAnswers() != null ? List.copyOf(
+                        questionDto.getAnswers()
                                 .stream()
                                 .map(answerDtoMapper::fromDo)
                                 .toList()) : null);

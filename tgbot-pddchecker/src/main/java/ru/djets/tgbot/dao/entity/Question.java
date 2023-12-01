@@ -36,6 +36,9 @@ public class Question extends VersionedAbstractEntity<UUID> {
     @Column(name = "description")
     String description;
 
+    @Column(name = "number_question")
+    int numberQuestion;
+
     @Column(name = "number_correct_answer")
     int numberCorrectAnswer;
 

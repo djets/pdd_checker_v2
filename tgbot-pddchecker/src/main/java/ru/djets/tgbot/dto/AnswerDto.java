@@ -15,6 +15,8 @@ public class AnswerDto {
 
     private String answerText;
 
+    private Integer numberAnswer;
+
     private Long version;
 
     public String getId() {
@@ -31,6 +33,14 @@ public class AnswerDto {
 
     public void setAnswerText(String answerText) {
         this.answerText = answerText;
+    }
+
+    public int getNumberAnswer() {
+        return this.numberAnswer;
+    }
+
+    public void setNumberAnswer(int numberAnswer) {
+        this.numberAnswer = numberAnswer;
     }
 
     public Long getVersion() {

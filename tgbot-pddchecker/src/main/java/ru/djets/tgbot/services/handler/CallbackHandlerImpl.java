@@ -3,6 +3,7 @@ package ru.djets.tgbot.services.handler;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -24,6 +25,7 @@ import static ru.djets.tgbot.enums.CallbackPrefix.*;
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Slf4j
 public class CallbackHandlerImpl implements CallbackHandler {
 
     BotStateService botStateService;
@@ -56,23 +58,30 @@ public class CallbackHandlerImpl implements CallbackHandler {
         if (data.startsWith(QUESTION_.name())) {
             int selectedNumberQuestionDto = Integer
                     .parseInt(data.replace(QUESTION_.toString(), ""));
-            QuestionDto selectedQuestionDto = questionService
-                    .getAllByTicketNumber(botStateService.getTicketSelectedMap().get(chatId))
-                    .get(selectedNumberQuestionDto - 1);
+//            QuestionDto selectedQuestionDto = questionService
+//                    .getAllByTicketNumber(botStateService.getTicketSelectedMap().get(chatId))
+//                    .get(selectedNumberQuestionDto - 1);
 
-            botStateService.getQuestionSelectedMap()
-                    .merge(chatId, selectedQuestionDto, (k, v) -> selectedQuestionDto);
+            Integer ticketNumber = botStateService.getTicketSelectedMap().get(chatId);
+            if (ticketNumber != null) {
+                QuestionDto selectQuestion = questionService
+                        .findQuestionByTicketNumberAndNumberQuestion(
+                                botStateService.getTicketSelectedMap().get(chatId),
+                                selectedNumberQuestionDto);
 
-            if (selectedQuestionDto.getPathImage() != null) {
-                longPollingBotService.execute(
-                        botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION));
-            } else {
-                return botMessageFactory.create(chatId, TypeMessage.QUESTION);
+                botStateService.getQuestionSelectedMap()
+                        .merge(chatId, selectQuestion, (k, v) -> selectQuestion);
+
+                if (selectQuestion.getPathImage() != null && !selectQuestion.getPathImage().isEmpty()) {
+                    longPollingBotService.execute(
+                            botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION));
+                } else {
+                    return botMessageFactory.create(chatId, TypeMessage.QUESTION);
+                }
             }
         }
 
         if (data.startsWith(ANSWER_.name())) {
-            //TODO реализовать botState в базе
             if (botStateService.getQuestionSelectedMap().containsKey(chatId)) {
                 if (callbackQuery.getMessage().hasPhoto()) {
                     longPollingBotService

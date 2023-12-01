@@ -9,7 +9,6 @@ import ru.djets.tgbot.dto.QuestionDto;
 import ru.djets.tgbot.enums.CallbackPrefix;
 import ru.djets.tgbot.services.BotStateService;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,18 +19,20 @@ public class QuestionMessageCreator implements SendMessageCreator {
     BotStateService botStateService;
 
     InlineKeyboardsCreator inlineKeyboardsCreator;
+
     // A question with a keyboard to answer
     @Override
     public SendMessage createSendMessage(String chatId) {
         QuestionDto questionDto = botStateService.getQuestionSelectedMap().get(chatId);
-        AtomicInteger numberOfObject = new AtomicInteger(1);
         return SendMessage.builder()
                 .chatId(chatId)
                 .text(questionDto.getTextQuestion() + "\n" +
-                        questionDto.getAnswers().stream()
-                                .map(answer -> numberOfObject.getAndIncrement() +
-                                        ". " + answer.getAnswerText())
-                                .collect(Collectors.joining("\n")))
+                                "_______\n" +
+                                questionDto.getAnswers().stream()
+                                        .map(answerDto ->
+                                                answerDto.getNumberAnswer() + ". " +
+                                                        answerDto.getAnswerText())
+                                        .collect(Collectors.joining("\n")))
                 .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,
                         questionDto.getAnswers().size(),

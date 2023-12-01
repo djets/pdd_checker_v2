@@ -27,14 +27,17 @@ public class Question extends VersionedAbstractEntity<UUID> {
     @Column(name = "question_id", nullable = false)
     UUID id;
 
-    @Column(name = "text_question", nullable = false)
+    @Column(name = "text_question", nullable = false, length = 3000)
     String textQuestion;
 
-    @Column(name = "path_image")
+    @Column(name = "path_image", length = 3000)
     String pathImage;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 3000)
     String description;
+
+    @Column(name = "number_question")
+    int numberQuestion;
 
     @Column(name = "number_correct_answer")
     int numberCorrectAnswer;

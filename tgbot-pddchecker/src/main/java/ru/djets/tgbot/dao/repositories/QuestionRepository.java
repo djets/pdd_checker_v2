@@ -5,6 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import ru.djets.tgbot.dao.entity.Question;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface QuestionRepository extends
@@ -16,4 +17,6 @@ public interface QuestionRepository extends
     List<Question> findAllByTicketNumber(int ticketNumber);
 
     List<Question> searchQuestionByTextQuestionContaining(String searchText);
+
+    Optional<Question> findQuestionByTicketNumberAndNumberQuestion(int ticketNumber, int numberQuestion);
 }

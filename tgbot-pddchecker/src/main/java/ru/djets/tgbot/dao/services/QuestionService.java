@@ -16,4 +16,5 @@ public interface QuestionService {
 
     List<QuestionDto> searchQuestionByTextQuestionContaining(String searchText);
 
+    QuestionDto findQuestionByTicketNumberAndNumberQuestion(int ticketNumber, int numberQuestion);
 }

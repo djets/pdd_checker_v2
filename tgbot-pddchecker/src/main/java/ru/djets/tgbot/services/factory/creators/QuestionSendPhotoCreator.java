@@ -3,6 +3,7 @@ package ru.djets.tgbot.services.factory.creators;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -13,12 +14,12 @@ import ru.djets.tgbot.services.BotStateService;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Slf4j
 public class QuestionSendPhotoCreator implements SendPhotoCreator {
 
     BotStateService botStateService;
@@ -29,13 +30,14 @@ public class QuestionSendPhotoCreator implements SendPhotoCreator {
     @Override
     public SendPhoto createSendPhoto(String chatId) {
         QuestionDto questionDto = botStateService.getQuestionSelectedMap().get(chatId);
-        AtomicInteger numberOfObject = new AtomicInteger(1);
         SendPhoto sendPhoto = new SendPhoto();
 
         ClassPathResource pathResource = new ClassPathResource(
                 questionDto.getPathImage(),
                 ClassLoader.getSystemClassLoader()
         );
+        log.info("path: {}", pathResource);
+
         try {
             File image = pathResource.getFile();
             sendPhoto.setPhoto(new InputFile(image));
@@ -44,14 +46,13 @@ public class QuestionSendPhotoCreator implements SendPhotoCreator {
         }
 
         sendPhoto.setChatId(chatId);
-        sendPhoto.setCaption(
-                questionDto.getTextQuestion() + "\n" +
+        sendPhoto.setCaption(questionDto.getTextQuestion() + "\n" +
+                        "_______\n" +
                         questionDto.getAnswers().stream()
-                                .map(answer -> numberOfObject.getAndIncrement() +
-                                        ". " + answer.getAnswerText())
-                                .collect(Collectors.joining("\n")
-                                )
-        );
+                                .map(answerDto ->
+                                        answerDto.getNumberAnswer() + ". " +
+                                                answerDto.getAnswerText())
+                                .collect(Collectors.joining("\n")));
         sendPhoto.setReplyMarkup(
                 inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,

@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.djets.webclient.dao.repositories.QuestionJpaRepository;
 import ru.djets.webclient.services.WebErrorHandler;
-import ru.djets.webclient.utils.DataTemplateLoader;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -31,10 +30,10 @@ public class AppConf {
                 .build();
     }
 
-    @Bean
-    public void loadData() {
-        questionJpaRepository.deleteAll();
-        DataTemplateLoader dataTemplateLoader = new DataTemplateLoader(questionJpaRepository);
-        dataTemplateLoader.createQuestion(10);
-    }
+//    @Bean
+//    public void loadData() {
+//        questionJpaRepository.deleteAll();
+//        DataTemplateLoader dataTemplateLoader = new DataTemplateLoader(questionJpaRepository);
+//        dataTemplateLoader.createQuestion(10);
+//    }
 }

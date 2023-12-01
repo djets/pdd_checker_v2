@@ -10,10 +10,12 @@ import java.util.UUID;
 public class AnswerDtoMapper implements DtoMapper<Answer, AnswerDto> {
     @Override
     public AnswerDto toDo(Answer answer) {
-        return new AnswerDto(
-                answer.getId().toString(),
-                answer.getAnswerText(),
-                answer.getVersion());
+        AnswerDto answerDto = new AnswerDto();
+        answerDto.setId(answer.getId().toString());
+        answerDto.setAnswerText(answer.getAnswerText());
+        answerDto.setNumberAnswer(answer.getNumberAnswer());
+        answerDto.setVersion(answer.getVersion());
+        return answerDto;
     }
 
     @Override
@@ -21,6 +23,7 @@ public class AnswerDtoMapper implements DtoMapper<Answer, AnswerDto> {
         Answer answer = new Answer();
         answer.setId(answerDto.getId() != null ? UUID.fromString(answerDto.getId()) : null);
         answer.setAnswerText(answerDto.getAnswerText());
+        answer.setNumberAnswer(answerDto.getNumberAnswer());
         answer.setVersion(answerDto.getVersion());
         return answer;
     }

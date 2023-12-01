@@ -34,6 +34,8 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
 
         int numberSelectedAnswer = Integer.parseInt(callbackQuery
                 .getData()
+                .replace("❌", "")
+                .replace("✅", "")
                 .replace(CallbackPrefix.ANSWER_.toString(), ""));
 
         EditMessageText editMessageText = new EditMessageText();
@@ -42,7 +44,8 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
         editMessageText.setChatId(chatId);
         editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
         editMessageText.setText(callbackQuery.getMessage().getText() +
-                "\n\n" + questionDto.getDescription());
+                "\n\n" + "________" + "\n" +
+                questionDto.getDescription());
         editMessageText.setReplyMarkup(
                 inlineKeyboardsCreator.createInlineKeyboard(
                         messageKeyboard,
@@ -58,6 +61,8 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
 
         int numberSelectedAnswer = Integer.parseInt(callbackQuery
                 .getData()
+                .replace("❌", "")
+                .replace("✅", "")
                 .replace(CallbackPrefix.ANSWER_.toString(), ""));
 
         EditMessageMedia editMessageMedia = new EditMessageMedia();
@@ -72,26 +77,13 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
         inputMediaPhotos
                 .forEach(inputMediaPhoto ->
                         inputMediaPhoto.setCaption(caption +
-                                "\n\n" + questionDto.getDescription()));
-
-//        inputMediaPhotos.stream()
-//                .findFirst()
-//                .orElseThrow()
-//                .setCaption(caption + "\n\n" + questionDto.getDescription());
-//                .findFirst().findFirst()
-//        String fileId = photos.stream()
-//                .sorted(Comparator.comparing(PhotoSize::getFileSize).reversed())
-//                .findFirst()
-//                .orElse(null).getFileId();
-//        InputMediaPhoto inputMediaPhoto = new InputMediaPhoto(fileId);
-
-//        inputMediaPhoto.setCaption(caption + "\n\n" + questionDto.getDescription());
+                                "\n\n" + "________" + "\n" +
+                                questionDto.getDescription()));
 
         inputMediaPhotos.forEach(editMessageMedia::setMedia);
 
         editMessageMedia.setChatId(callbackQuery.getMessage().getChatId().toString());
         editMessageMedia.setMessageId(callbackQuery.getMessage().getMessageId());
-//        editMessageMedia.setMedia(inputMediaPhoto);
         editMessageMedia.setReplyMarkup(
                 inlineKeyboardsCreator.createInlineKeyboard(
                         messageKeyboard,

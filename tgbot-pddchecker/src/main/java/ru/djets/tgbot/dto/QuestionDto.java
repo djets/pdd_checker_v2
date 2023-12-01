@@ -16,7 +16,7 @@ public class QuestionDto {
 
     private String textQuestion;
 
-    private int ticketNumber, numberCorrectAnswer;
+    private int numberQuestion, ticketNumber, numberCorrectAnswer;
 
     private List<AnswerDto> answers = new ArrayList<>();
 
@@ -52,6 +52,14 @@ public class QuestionDto {
 
     public void setTextQuestion(String textQuestion) {
         this.textQuestion = textQuestion;
+    }
+
+    public int getNumberQuestion() {
+        return numberQuestion;
+    }
+
+    public void setNumberQuestion(int numberQuestion) {
+        this.numberQuestion = numberQuestion;
     }
 
     public int getTicketNumber() {

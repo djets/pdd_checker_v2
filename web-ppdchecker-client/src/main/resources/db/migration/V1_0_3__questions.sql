@@ -10,9 +10,9 @@ CREATE TABLE public.questions
     object_version        BIGINT                      NOT NULL,
     created_date          TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     last_updated_date     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    text_question         VARCHAR(255)                NOT NULL,
-    path_image            VARCHAR(255),
-    description           VARCHAR(255),
+    text_question         VARCHAR(3000)                NOT NULL,
+    path_image            VARCHAR(3000),
+    description           VARCHAR(3000),
     number_correct_answer INTEGER,
     ticket_number         INTEGER,
     CONSTRAINT pk_questions PRIMARY KEY (question_id)

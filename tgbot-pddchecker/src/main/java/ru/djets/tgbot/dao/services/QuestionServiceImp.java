@@ -1,5 +1,6 @@
 package ru.djets.tgbot.dao.services;
 
+import jakarta.ws.rs.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +11,7 @@ import ru.djets.tgbot.dto.QuestionDto;
 import ru.djets.tgbot.dto.mapper.DtoMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,5 +56,12 @@ public class QuestionServiceImp implements QuestionService {
                 .stream()
                 .map(dtoMapper::toDo)
                 .toList();
+    }
+
+    @Override
+    public QuestionDto findQuestionByTicketNumberAndNumberQuestion(int ticketNumber,  int numberQuestion) {
+        Optional<Question> optionalQuestion = questionRepository
+                .findQuestionByTicketNumberAndNumberQuestion(ticketNumber, numberQuestion);
+        return dtoMapper.toDo(optionalQuestion.orElseThrow(NotFoundException::new));
     }
 }

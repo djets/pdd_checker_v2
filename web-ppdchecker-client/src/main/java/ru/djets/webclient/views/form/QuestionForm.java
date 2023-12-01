@@ -13,6 +13,7 @@ import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -29,9 +30,10 @@ import java.util.List;
 public class QuestionForm extends FormLayout {
     TextArea textQuestion = new TextArea("Текст вопроса");
     TextArea description = new TextArea("Описание");
-    TextField pathImage = new TextField("Номер билета");
-    TextField ticketNumber = new TextField("Номер билета");
-    TextField numberCorrectAnswer = new TextField("Номер правильного ответа");
+    TextField pathImage = new TextField("Ссылка на картинку");
+    IntegerField numberQuestion = new IntegerField("Номер вопроса");
+    IntegerField numberCorrectAnswer = new IntegerField("Номер правильного ответа");
+    IntegerField ticketNumber = new IntegerField("Номер билета");
 
     Grid<AnswerDto> answerDtoGrid = new Grid<>(AnswerDto.class, false);
 
@@ -59,6 +61,7 @@ public class QuestionForm extends FormLayout {
     private Component getBlockQuestion() {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.add(
+                numberQuestion,
                 ticketNumber,
                 numberCorrectAnswer
         );
@@ -66,9 +69,14 @@ public class QuestionForm extends FormLayout {
     }
 
     private void getBlockAnswers() {
-        Grid.Column<AnswerDto> answerDtoColumn = answerDtoGrid.addColumn(AnswerDto::getAnswerText).setHeader("Ответы");
+        Grid.Column<AnswerDto> numberAnswerColumn = answerDtoGrid.addColumn(AnswerDto::getNumberAnswer)
+                .setHeader("N").setSortable(true).setWidth("20px").setFlexGrow(0);
+        Grid.Column<AnswerDto> answerDtoColumn =
+                answerDtoGrid.addColumn(AnswerDto::getAnswerText).setHeader("Ответы");
         answerDtoGrid.getColumns().forEach(col -> col.setAutoWidth(true));
         answerDtoGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        answerDtoColumn.setAutoWidth(false);
+        answerDtoColumn.setFlexGrow(1);
 
         Editor<AnswerDto> editor = answerDtoGrid.getEditor();
 
@@ -81,11 +89,19 @@ public class QuestionForm extends FormLayout {
                 answerDtoGrid.getEditor().editItem(answerDto);
             });
             return editButton;
-        });
+        }).setWidth("150px").setFlexGrow(0);
 
         Binder<AnswerDto> answerDtoBinder = new Binder<>(AnswerDto.class);
         editor.setBinder(answerDtoBinder);
         editor.setBuffered(true);
+
+        IntegerField numberAnswerField = new IntegerField();
+        numberAnswerField.setWidthFull();
+        answerDtoBinder.forField(numberAnswerField)
+                .asRequired("Field NotNull")
+                .bind(AnswerDto::getNumberAnswer,
+                        AnswerDto::setNumberAnswer);
+        numberAnswerColumn.setEditorComponent(numberAnswerField);
 
         TextField answerTextField = new TextField();
         answerTextField.setWidthFull();
