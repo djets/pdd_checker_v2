@@ -138,7 +138,9 @@ public class QuestionForm extends FormLayout {
 
         addAnswerButton.addClickListener(event -> {
             List<AnswerDto> copyAnswersDto = new ArrayList<>(binder.getBean().getAnswers());
-            copyAnswersDto.add(new AnswerDto());
+            AnswerDto answerDto = new AnswerDto();
+            answerDto.setNumberAnswer(copyAnswersDto.size() + 1);
+            copyAnswersDto.add(answerDto);
             binder.getBean().setAnswers(copyAnswersDto);
             updateAnswer();
         });

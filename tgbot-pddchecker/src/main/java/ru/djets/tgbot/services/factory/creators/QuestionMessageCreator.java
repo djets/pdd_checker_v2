@@ -26,13 +26,15 @@ public class QuestionMessageCreator implements SendMessageCreator {
         QuestionDto questionDto = botStateService.getQuestionSelectedMap().get(chatId);
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(questionDto.getTextQuestion() + "\n" +
-                                "_______\n" +
-                                questionDto.getAnswers().stream()
-                                        .map(answerDto ->
-                                                answerDto.getNumberAnswer() + ". " +
-                                                        answerDto.getAnswerText())
-                                        .collect(Collectors.joining("\n")))
+                .text("Билет: " + questionDto.getTicketNumber() + "\n" +
+                        "Вопрос: " + questionDto.getNumberQuestion() + "\n\n" +
+                        questionDto.getTextQuestion() + "\n" +
+                        "_______\n" +
+                        questionDto.getAnswers().stream()
+                                .map(answerDto ->
+                                        answerDto.getNumberAnswer() + ". " +
+                                                answerDto.getAnswerText())
+                                .collect(Collectors.joining("\n")))
                 .replyMarkup(inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,
                         questionDto.getAnswers().size(),

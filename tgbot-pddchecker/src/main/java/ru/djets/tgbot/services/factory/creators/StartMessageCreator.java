@@ -20,7 +20,7 @@ public class StartMessageCreator implements SendMessageCreator {
                 .text("Добро пожаловать в бот проверки знаний ПДД! \n" +
                         "Данное приложение создано и запускается ИСКЛЮЧИТЕЛЬНО \nв ознакомительных целях.\n" +
                         "Данные взяты из открытых источников.\n" +
-                        "Для начала работы приложения отправьте команду /start")
+                        "Для начала работы нажмите кнопку выбора билета")
                 .replyMarkup(replyKeyboardMarkupCreator.createReplyKeyboardMarkup())
                 .build();
     }

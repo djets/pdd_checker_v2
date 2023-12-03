@@ -44,15 +44,16 @@ public class QuestionSendPhotoCreator implements SendPhotoCreator {
         } catch (IOException e) {
             throw new RuntimeException("File image not found " + e.getMessage());
         }
-
         sendPhoto.setChatId(chatId);
-        sendPhoto.setCaption(questionDto.getTextQuestion() + "\n" +
-                        "_______\n" +
-                        questionDto.getAnswers().stream()
-                                .map(answerDto ->
-                                        answerDto.getNumberAnswer() + ". " +
-                                                answerDto.getAnswerText())
-                                .collect(Collectors.joining("\n")));
+        sendPhoto.setCaption("Билет: " + questionDto.getTicketNumber() + "\n" +
+                "Вопрос: " + questionDto.getNumberQuestion() + "\n\n" +
+                questionDto.getTextQuestion() + "\n" +
+                "_______\n" +
+                questionDto.getAnswers().stream()
+                        .map(answerDto ->
+                                answerDto.getNumberAnswer() + ". " +
+                                        answerDto.getAnswerText())
+                        .collect(Collectors.joining("\n")));
         sendPhoto.setReplyMarkup(
                 inlineKeyboardsCreator.createInlineKeyboard(
                         CallbackPrefix.ANSWER_,

@@ -68,7 +68,6 @@ public class CallbackHandlerImpl implements CallbackHandler {
                         .findQuestionByTicketNumberAndNumberQuestion(
                                 botStateService.getTicketSelectedMap().get(chatId),
                                 selectedNumberQuestionDto);
-
                 botStateService.getQuestionSelectedMap()
                         .merge(chatId, selectQuestion, (k, v) -> selectQuestion);
 
@@ -97,11 +96,15 @@ public class CallbackHandlerImpl implements CallbackHandler {
         if (data.startsWith(NEXT_.name())) {
             List<QuestionDto> questionDtoList = questionService
                     .getAllByTicketNumber(botStateService.getTicketSelectedMap().get(chatId));
-            int numberNextQuestion = questionDtoList
-                    .indexOf(botStateService.getQuestionSelectedMap().get(chatId)) + 1;
+//            int numberNextQuestion = questionDtoList
+//                    .indexOf(botStateService
+//                            .getQuestionSelectedMap()
+//                            .get(chatId)) + 1;
 
-            if (numberNextQuestion < questionDtoList.size()) {
-                QuestionDto nextQuestionDto = questionDtoList.get(numberNextQuestion);
+            int numberNextQuestion = botStateService.getQuestionSelectedMap().get(chatId).getNumberQuestion() + 1;
+
+            if (numberNextQuestion < questionDtoList.size() + 1) {
+                QuestionDto nextQuestionDto = questionDtoList.get(numberNextQuestion - 1);
                 botStateService.getQuestionSelectedMap()
                         .merge(chatId, nextQuestionDto, (k, v) -> nextQuestionDto);
 

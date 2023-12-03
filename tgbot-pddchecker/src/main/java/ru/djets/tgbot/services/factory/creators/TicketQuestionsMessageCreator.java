@@ -16,13 +16,13 @@ public class TicketQuestionsMessageCreator implements SendMessageCreator {
 
     QuestionService questionService;
 
-    BotStateService postProcessor;
+    BotStateService botStateService;
 
     InlineKeyboardsCreator inlineKeyboardsCreator;
 
     @Override
     public SendMessage createSendMessage(String chatId) {
-        Integer numberSelectedTicked = postProcessor.getTicketSelectedMap().get(chatId);
+        Integer numberSelectedTicked = botStateService.getTicketSelectedMap().get(chatId);
         return SendMessage.builder()
                 .chatId(chatId)
                 .text("Вопросы билета " + numberSelectedTicked + ". \n")

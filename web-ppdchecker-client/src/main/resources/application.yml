@@ -21,7 +21,7 @@ spring:
   flyway:
     baseline-description: "<<Flyway initial migration>>"
     locations: db/migration
-    enabled: true
+    enabled: false
     baseline-on-migrate: true
     schemas: public
     default-schema: public

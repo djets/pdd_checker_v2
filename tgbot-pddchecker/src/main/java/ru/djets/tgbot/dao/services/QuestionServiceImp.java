@@ -31,7 +31,7 @@ public class QuestionServiceImp implements QuestionService {
 
     @Override
     public List<QuestionDto> getAllByTicketNumber(int ticketNumber) {
-        return questionRepository.findAllByTicketNumber(ticketNumber)
+        return questionRepository.findAllByTicketNumberOrderByNumberQuestion(ticketNumber)
                 .stream()
                 .map(dtoMapper::toDo)
                 .toList();

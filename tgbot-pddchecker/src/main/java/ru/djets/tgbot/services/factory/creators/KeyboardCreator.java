@@ -43,7 +43,11 @@ public class KeyboardCreator implements InlineKeyboardsCreator, ReplyKeyboardMar
         List<InlineKeyboardButton> keyboardButtons = messageKeyboard.getKeyboard().get(0);
         keyboardButtons
                 .forEach(inlineKeyboardButton -> {
-                    int numberButton = Integer.parseInt(inlineKeyboardButton.getText());
+                    int numberButton = Integer.parseInt(
+                            inlineKeyboardButton.getText()
+                                    .replace("❌ ", "")
+                                    .replace("✅ ", "")
+                                    .replace(CallbackPrefix.ANSWER_.toString(), ""));
                     if (numberButton == numberSelectedAnswer) {
                         if (correctAnswer == numberSelectedAnswer) {
                             inlineKeyboardButton.setText(EmojiParser

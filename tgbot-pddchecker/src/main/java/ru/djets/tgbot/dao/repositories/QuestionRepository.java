@@ -4,9 +4,7 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import ru.djets.tgbot.dao.entity.Question;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public interface QuestionRepository extends
         ListCrudRepository<Question, UUID>,
@@ -14,7 +12,7 @@ public interface QuestionRepository extends
 
     int countAllByTicketNumber(int ticketNumber);
 
-    List<Question> findAllByTicketNumber(int ticketNumber);
+    List<Question> findAllByTicketNumberOrderByNumberQuestion(int ticketNumber);
 
     List<Question> searchQuestionByTextQuestionContaining(String searchText);
 

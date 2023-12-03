@@ -3,6 +3,7 @@ package ru.djets.tgbot.services.handler;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -21,6 +22,7 @@ import java.util.List;
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Slf4j
 public class EditMediaHandlerImpl implements EditMediaHandler {
 
     BotStateService service;
@@ -31,11 +33,9 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
     public EditMessageText editSendMessage(CallbackQuery callbackQuery) {
         String chatId = callbackQuery.getMessage().getChatId().toString();
         QuestionDto questionDto = service.getQuestionSelectedMap().get(chatId);
-
+        log.info(callbackQuery.getData());
         int numberSelectedAnswer = Integer.parseInt(callbackQuery
                 .getData()
-                .replace("❌", "")
-                .replace("✅", "")
                 .replace(CallbackPrefix.ANSWER_.toString(), ""));
 
         EditMessageText editMessageText = new EditMessageText();
@@ -61,8 +61,6 @@ public class EditMediaHandlerImpl implements EditMediaHandler {
 
         int numberSelectedAnswer = Integer.parseInt(callbackQuery
                 .getData()
-                .replace("❌", "")
-                .replace("✅", "")
                 .replace(CallbackPrefix.ANSWER_.toString(), ""));
 
         EditMessageMedia editMessageMedia = new EditMessageMedia();
