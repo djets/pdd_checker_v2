@@ -44,6 +44,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
     public BotApiMethod<?> handle(CallbackQuery callbackQuery) throws TelegramApiException {
         String data = callbackQuery.getData();
         String chatId = callbackQuery.getMessage().getChatId().toString();
+        Integer ticketNumber = botStateService.getTicketSelectedMap().get(chatId);
 
         if (data.startsWith(TICKET_.name())) {
             int numberSelectedTicket = Integer
@@ -58,18 +59,13 @@ public class CallbackHandlerImpl implements CallbackHandler {
         if (data.startsWith(QUESTION_.name())) {
             int selectedNumberQuestionDto = Integer
                     .parseInt(data.replace(QUESTION_.toString(), ""));
-//            QuestionDto selectedQuestionDto = questionService
-//                    .getAllByTicketNumber(botStateService.getTicketSelectedMap().get(chatId))
-//                    .get(selectedNumberQuestionDto - 1);
 
-            Integer ticketNumber = botStateService.getTicketSelectedMap().get(chatId);
             if (ticketNumber != null) {
                 QuestionDto selectQuestion = questionService
                         .findQuestionByTicketNumberAndNumberQuestion(
-                                botStateService.getTicketSelectedMap().get(chatId),
+                                ticketNumber,
                                 selectedNumberQuestionDto);
-                botStateService.getQuestionSelectedMap()
-                        .merge(chatId, selectQuestion, (k, v) -> selectQuestion);
+                saveState(chatId, selectQuestion);
 
                 if (selectQuestion.getPathImage() != null && !selectQuestion.getPathImage().isEmpty()) {
                     longPollingBotService.execute(
@@ -94,31 +90,36 @@ public class CallbackHandlerImpl implements CallbackHandler {
         }
 
         if (data.startsWith(NEXT_.name())) {
-            List<QuestionDto> questionDtoList = questionService
-                    .getAllByTicketNumber(botStateService.getTicketSelectedMap().get(chatId));
-//            int numberNextQuestion = questionDtoList
-//                    .indexOf(botStateService
-//                            .getQuestionSelectedMap()
-//                            .get(chatId)) + 1;
+            if (ticketNumber != null) {
+                List<QuestionDto> questionDtoList = questionService
+                        .getAllByTicketNumber(ticketNumber);
 
-            int numberNextQuestion = botStateService.getQuestionSelectedMap().get(chatId).getNumberQuestion() + 1;
+                int numberNextQuestion = botStateService
+                        .getQuestionSelectedMap().get(chatId).getNumberQuestion() + 1;
 
-            if (numberNextQuestion < questionDtoList.size() + 1) {
-                QuestionDto nextQuestionDto = questionDtoList.get(numberNextQuestion - 1);
-                botStateService.getQuestionSelectedMap()
-                        .merge(chatId, nextQuestionDto, (k, v) -> nextQuestionDto);
+                if (numberNextQuestion < questionDtoList.size() + 1) {
+                    QuestionDto nextQuestionDto = questionDtoList.get(numberNextQuestion - 1);
+                    saveState(chatId, nextQuestionDto);
 
-                if (nextQuestionDto.getPathImage() != null) {
-                    longPollingBotService
-                            .execute(botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION));
+                    if (nextQuestionDto.getPathImage() != null && !nextQuestionDto.getPathImage().isEmpty()) {
+                        longPollingBotService
+                                .execute(botSendPhotoFactory.create(chatId, TypeSendPhoto.QUESTION));
+                    } else {
+                        return botMessageFactory.create(chatId, TypeMessage.QUESTION);
+                    }
+
                 } else {
-                    return botMessageFactory.create(chatId, TypeMessage.QUESTION);
+                    return botMessageFactory.create(chatId, TypeMessage.OUT_OF_QUESTION);
                 }
-
             } else {
-                return botMessageFactory.create(chatId, TypeMessage.OUT_OF_QUESTION);
+            return botMessageFactory.create(chatId, TypeMessage.WRONG_SELECTED_TICKET);
             }
         }
         return null;
+    }
+
+    private void saveState(String chatId, QuestionDto nextQuestionDto) {
+        botStateService.getQuestionSelectedMap()
+                .merge(chatId, nextQuestionDto, (k, v) -> nextQuestionDto);
     }
 }

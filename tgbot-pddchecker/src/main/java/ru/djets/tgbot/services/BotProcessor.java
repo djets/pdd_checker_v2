@@ -42,6 +42,9 @@ public class BotProcessor {
                 throw new RuntimeException(e);
             }
         }
-        return messageHandler.handle(update.getMessage());
+        if (update.hasMessage()) {
+            return messageHandler.handle(update.getMessage());
+        }
+        return null;
     }
 }
