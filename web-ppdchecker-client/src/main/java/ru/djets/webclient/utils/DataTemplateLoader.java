@@ -36,7 +36,7 @@ public class DataTemplateLoader {
                             .map(integer1 -> {
                                 Answer answer = new Answer();
                                 answer.setNumberAnswer(integer1);
-                                answer.setAnswerText("Answer---" + integer1);
+                                answer.setAnswerText("Answer-" + integer1);
                                 return answer;
                             })
                             .toList());
