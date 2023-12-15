@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/pdd-db
+    username: pdd-user
+    password: pgpwd
+
+  jpa:
+    show-sql: false
+    generate-ddl: false
+    open-in-view: false
+
+telegram:
+  bot-name: "@ppdcheck_testbot"

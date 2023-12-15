@@ -1,0 +1,41 @@
+server:
+  port: 7777
+
+#logging:
+#  level:
+#    root: debug
+#    logging.level.org.hibernate: info
+#    org.postgresql: error
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/pdd-db
+    username: pdd-user
+    password: pgpwd
+
+  jpa:
+    show-sql: false
+    generate-ddl: false
+    open-in-view: false
+
+  flyway:
+    baseline-description: "<<Flyway initial migration>>"
+    locations: db/migration
+    enabled: false
+    baseline-on-migrate: true
+    schemas: public
+    default-schema: public
+
+telegram:
+  api-url: "https://api.telegram.org"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+---
+spring:
+  config:
+    activate:
+      on-profile: development
